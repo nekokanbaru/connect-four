@@ -1,4 +1,5 @@
 let currentPlayer = 1;
+let matrix = Array(6).fill().map(() => Array(7).fill(0)); //make a 2d array of the board and fill it with 0s
 
 function cursorMove() {
   let circle = document.querySelector("#circle");
@@ -16,6 +17,7 @@ function place(columnID) {
   let circle = document.querySelector("#circle");
   let currentPlayerCircle = document.querySelector('.chip');
   let currentPlayerText = document.querySelector('#playerText');
+  let currentColumnIndex = columnID.slice(6) - 1; //because we get the current column as a string 'column1' 'column4'.. etc
 
   for (let i = columnRows.length - 1; i >= 0; i--) {
     if (
@@ -30,20 +32,21 @@ function place(columnID) {
   }
   if (this.currentPlayer == 1) {
     currentPlayerText.innerText = "Player 1";
-    columnRows[rowIndex].style.backgroundColor = "yellow";
     circle.style.backgroundColor = "red";
     currentPlayerCircle.style.backgroundColor ="red";
     currentPlayerCircle.style.boxShadow = "inset 5px 0px 5px rgb(128, 0, 0)";
+    matrix[rowIndex][currentColumnIndex] = 2;
   } else {
     currentPlayerText.innerText = "Player 2";
-    columnRows[rowIndex].style.backgroundColor = "red";
     circle.style.backgroundColor = "yellow";
     currentPlayerCircle.style.backgroundColor ="yellow";
     currentPlayerCircle.style.boxShadow = "inset 5px 0px 5px rgb(145, 145, 7)";
+    matrix[rowIndex][currentColumnIndex] = 1;
   }
 
   this.currentPlayer == 1 ? (this.currentPlayer = 2) : (this.currentPlayer = 1);
-  
+  fillTable();
+  console.table(matrix);
 }
 
 function isGameFinished(currentColumn, currentRow) {
@@ -171,7 +174,8 @@ function playerWins() {
 }
 
 function playAgain() {
-  resetTable()
+  resetTable();
+  resetMatrix();
   let wrapper = document.querySelector(".board-wrapper");
   wrapper.style.display = 'block';
 
@@ -180,7 +184,6 @@ function playAgain() {
 }
 
 function resetTable() {
-  this.currentPlayer == 1 ? (this.currentPlayer = 2) : (this.currentPlayer = 1);
   let columnArray = [];
   for (let i = 1; i <= 7; i++) {
     columnArray.push(document.querySelector("#column" + i));
@@ -190,5 +193,36 @@ function resetTable() {
       columnArray[i].children[j].style.backgroundColor = 'white';
     }
   }
-  console.log(columnArray);
 }
+
+function resetMatrix() {
+  for(let i = 0; i < 6; i++) {
+    for(let j = 0; j < 7; j++) {
+      matrix[i][j] = 0;
+    }
+  }
+}
+
+function fillTable() {
+  //create a 2d array of the board containing the div elements
+  let columnArray = [];
+  for (let i = 1; i <= 7; i++) {
+    columnArray.push(document.querySelector("#column" + i));
+  }
+  //to get the specific position use columnArray[ColumnIndex].children[RowIndex]
+
+  //fill the current position with the appropriate color based on the 2d array
+  for(let i = 0; i < 6; i++) {
+    for(let j = 0; j < 7; j++) {
+      if(matrix[i][j] == 2) {
+        let column = document.querySelector("#column" + (j+1));
+        column.children[i].style.backgroundColor = "yellow";
+      }
+      else if(matrix[i][j] == 1) {
+        let column = document.querySelector("#column" + (j+1));
+        column.children[i].style.backgroundColor = "red";
+      }
+    }
+  }
+}
+
