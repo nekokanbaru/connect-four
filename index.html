@@ -6,15 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connect four</title>
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./style.css" />
     <script src="main.js"></script>
   </head>
   <body onload="cursorMove()">
+    <div class="create-game-wrapper">
+      <div class="buttons">
+        <button id="btnCreate">New Game</button>
+        <button id="btnJoin" onclick="showBoard()">Join Game</button>
+      </div>
+      <input type="text" id="txtGameId" onkeyup="disableButton()" />
+    </div>
+
     <div class="board-wrapper">
       <div id="circle"></div>
-
+      <h2 id="gameID"></h2>
+      <div class="board-cover"></div>
       <div class="board">
-        <div class="column" id="column1" onclick="place('column1')">
+        <div class="column" id="column1">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -22,7 +31,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column2" onclick="place('column2')">
+        <div class="column" id="column2">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -30,7 +39,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column3" onclick="place('column3')">
+        <div class="column" id="column3">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -38,7 +47,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column4" onclick="place('column4')">
+        <div class="column" id="column4">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -46,7 +55,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column5" onclick="place('column5')">
+        <div class="column" id="column5">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -54,7 +63,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column6" onclick="place('column6')">
+        <div class="column" id="column6">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -62,7 +71,7 @@
           <div class="row row5"></div>
           <div class="row row6"></div>
         </div>
-        <div class="column" id="column7" onclick="place('column7')">
+        <div class="column" id="column7">
           <div class="row row1"></div>
           <div class="row row2"></div>
           <div class="row row3"></div>
@@ -74,13 +83,139 @@
 
       <div class="player">
         <p id="playerText">Player 1</p>
+        <!-- <span>'s turn</span> -->
         <div class="chip"></div>
       </div>
+
+      <!-- show the ids of the players that have joined -->
+      <!-- <div id="players"></div> -->
     </div>
 
     <div class="win-screen">
       <h1>!!! <span id="win-screen-player">PLAYER 1</span> WINS !!!</h1>
       <button onclick="playAgain()">play again</button>
     </div>
+
+    <script>
+      let clientId = null;
+      let gameId = null;
+      let playerColor = null;
+      let currentTurn = null;
+
+      let ws = new WebSocket("ws://localhost:9090");
+      const btnCreate = document.querySelector("#btnCreate");
+      const btnJoin = document.querySelector("#btnJoin");
+      const txtGameId = document.querySelector("#txtGameId");
+      // const divPlayers = document.querySelector("#players");
+      const boardColumns = document.querySelectorAll(".column");
+
+      btnJoin.disabled = true;
+      //wiring events
+      btnJoin.addEventListener("click", (e) => {
+        if (gameId === null) gameId = txtGameId.value;
+
+        const payload = {
+          method: "join",
+          clientId: clientId,
+          gameId: gameId,
+        };
+
+        ws.send(JSON.stringify(payload));
+      });
+
+      btnCreate.addEventListener("click", (e) => {
+        const payload = {
+          method: "create",
+          clientId: clientId,
+        };
+
+        ws.send(JSON.stringify(payload));
+      });
+
+      ws.onmessage = (message) => {
+        //message.data
+        const response = JSON.parse(message.data);
+        //connect
+        if (response.method === "connect") {
+          clientId = response.clientId;
+        }
+
+        //create
+        if (response.method === "create") {
+          gameId = response.game.id;
+          btnJoin.disabled = false;
+          txtGameId.value = response.game.id;
+        }
+
+        //update
+        if (response.method === "update") {
+          let matrix = response.game.board;
+          currentTurn = response.game.turn;
+          fillTable(matrix);
+          console.table(matrix);
+          if (response.game.state == "finished") {
+            playerWins(currentTurn);
+          }
+          changeTurn(currentTurn);
+          disableBoard(playerColor);
+        }
+
+        //join
+        if (response.method === "join") {
+          const game = response.game;
+          resetMatrix();
+
+          let gameIdHeader = document.querySelector("#gameID");
+          gameIdHeader.innerText = "game ID: " + response.game.id;
+
+          // //clear all players
+          // while (divPlayers.firstChild)
+          //   divPlayers.removeChild(divPlayers.firstChild);
+          //add all players
+          game.clients.forEach((c) => {
+            // const d = document.createElement("div");
+            // d.style.width = "200px";
+            // d.style.background = c.color;
+            // d.textContent = c.clientId;
+            // divPlayers.appendChild(d);
+
+            if (c.clientId === clientId) playerColor = c.color;
+
+            //change the color of the circle that follows your mouse
+            let playerCircle = document.querySelector("#circle");
+            if (playerColor == "red") {
+              playerCircle.style.backgroundColor = "red";
+            } else {
+              //yellow
+              playerCircle.style.backgroundColor = "yellow";
+            }
+
+            disableBoard(playerColor);
+          });
+
+          //play
+          for (let i = 0; i < boardColumns.length; i++) {
+            boardColumns[i].addEventListener("click", (e) => {
+              place("column" + (i + 1), playerColor);
+              let currentMatrix = getMatrix();
+              let gamestate = null;
+              let winScreen = document.querySelector(".win-screen");
+              if (winScreen.style.display == "flex") {
+                gamestate = "finished";
+              }
+              const payload = {
+                method: "play",
+                clientId: clientId,
+                gameId: gameId,
+                board: currentMatrix,
+                color: playerColor,
+                state: gamestate,
+              };
+              ws.send(JSON.stringify(payload));
+            });
+          }
+        }
+      };
+    </script>
   </body>
 </html>
