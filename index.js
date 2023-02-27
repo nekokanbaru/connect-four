@@ -3,10 +3,10 @@ const app = require("express")();
 app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"));
 app.get("/style.css", (req,res) => res.sendFile(__dirname + "/style.css"));
 app.get("/main.js", (req,res) => res.sendFile(__dirname + "/main.js"));
-app.listen(9091, () => console.log("listening on https port 9091"));
+app.listen(8081, () => console.log("listening on https port 8081"));
 const websocketServer = require("websocket").server;
 const httpServer = http.createServer();
-httpServer.listen(9090, () => console.log("listening on https port 9090"))
+httpServer.listen(8080, () => console.log("listening on https port 8080"))
 
 const clients = {};
 const games = {};
