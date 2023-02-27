@@ -1,0 +1,25 @@
+{
+  "name": "connect-four",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nekokanbaru/connect-four.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nekokanbaru/connect-four/issues"
+  },
+  "homepage": "https://github.com/nekokanbaru/connect-four#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "websocket": "^1.0.34"
+  }
+}

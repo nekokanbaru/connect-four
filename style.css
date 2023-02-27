@@ -8,6 +8,33 @@ body {
   justify-content: center;
 }
 
+.create-game-wrapper {
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width:500px;
+  gap:30px;
+}
+
+.create-game-wrapper .buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.create-game-wrapper button {
+  padding:1em 4em;
+}
+
+.create-game-wrapper input {
+  /* padding: 1em 4em; */
+  font-size: 1.5rem;
+}
+
+.create-game-wrapper button:hover {
+  cursor: pointer;
+}
+
 .board {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -18,6 +45,10 @@ body {
   margin: 20% auto 5% auto;
 }
 
+.board-wrapper {
+  display: none;
+}
+
 .player {
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   letter-spacing: 0.3ch;
@@ -25,11 +56,11 @@ body {
   justify-content: space-around;
   align-items: center;
   background:linear-gradient(blue,mediumblue);
-  width:40%;
+  width:50%;
   padding:0.5em 1em;
   margin:0 auto;
   color:white;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   border-radius: 2em;
 }
 
@@ -39,7 +70,6 @@ body {
   border-radius: 50%;
   margin-left: 10%;
   background-color: red;
-  box-shadow: inset 5px 0px 5px rgb(128, 0, 0);
 }
 
 .column {
@@ -100,7 +130,6 @@ body {
   width: 50px;
   border-radius: 50%;
   background-color: red;
-  /* box-shadow: -3px 0 2px rgb(156, 0, 0); */
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 999;
@@ -117,6 +146,13 @@ body {
   gap: 20px;
   width:500px;
   margin: 10% auto 5% auto;
+}
+
+.board-cover {
+  width:100%;
+  height:100%;
+  z-index:998;
+  position:absolute;
 }
 
 .row {
@@ -143,7 +179,6 @@ body {
   height:50px;
   border-radius: 50%;
   background-color: red;
-  box-shadow: inset 5px 0px 5px rgb(128, 0, 0);
   margin-left: 0;
 }
 

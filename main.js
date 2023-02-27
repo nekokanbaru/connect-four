@@ -10,13 +10,29 @@ function cursorMove() {
   document.addEventListener("mousemove", onMouseMove);
 }
 
-function place(columnID) {
+function getRowIndex(columnID) {
   let column = document.querySelector("#" + columnID);
   let columnRows = column.children;
   let rowIndex = null;
-  let circle = document.querySelector("#circle");
-  let currentPlayerCircle = document.querySelector('.chip');
-  let currentPlayerText = document.querySelector('#playerText');
+
+  for (let i = columnRows.length - 1; i >= 0; i--) {
+    if (
+      window.getComputedStyle(columnRows[i]).backgroundColor !=
+      "rgb(255, 255, 255)"
+    ) {
+    } else {
+      rowIndex = i;
+      isGameFinished(columnID, rowIndex);
+      break;
+    }
+  }
+  return rowIndex;
+}
+
+function place(columnID, playerColor) {
+  let column = document.querySelector("#" + columnID);
+  let columnRows = column.children;
+  let rowIndex = null;
   let currentColumnIndex = columnID.slice(6) - 1; //because we get the current column as a string 'column1' 'column4'.. etc
 
   for (let i = columnRows.length - 1; i >= 0; i--) {
@@ -30,23 +46,13 @@ function place(columnID) {
       break;
     }
   }
-  if (this.currentPlayer == 1) {
-    currentPlayerText.innerText = "Player 1";
-    circle.style.backgroundColor = "red";
-    currentPlayerCircle.style.backgroundColor ="red";
-    currentPlayerCircle.style.boxShadow = "inset 5px 0px 5px rgb(128, 0, 0)";
-    matrix[rowIndex][currentColumnIndex] = 2;
-  } else {
-    currentPlayerText.innerText = "Player 2";
-    circle.style.backgroundColor = "yellow";
-    currentPlayerCircle.style.backgroundColor ="yellow";
-    currentPlayerCircle.style.boxShadow = "inset 5px 0px 5px rgb(145, 145, 7)";
+  if (playerColor == "red") {
     matrix[rowIndex][currentColumnIndex] = 1;
+  } else {
+    matrix[rowIndex][currentColumnIndex] = 2;
   }
 
   this.currentPlayer == 1 ? (this.currentPlayer = 2) : (this.currentPlayer = 1);
-  fillTable();
-  console.table(matrix);
 }
 
 function isGameFinished(currentColumn, currentRow) {
@@ -62,12 +68,12 @@ function isGameFinished(currentColumn, currentRow) {
   let count = 1; //count starts at 1 because there is always one chip that we just inserted
     
     //first check right and left
-    while(currentColumnIndex != 6  && isPoint(columnArray[currentColumnIndex + 1].children[currentRow])) {
+    while(currentColumnIndex != 6  && isPoint(columnArray[currentColumnIndex + 1].children[currentRow], playerColor)) {
       count ++;
       currentColumnIndex++;
     }
       currentColumnIndex = initialColumnIndex; //start at the initial chip location and check left
-      while(currentColumnIndex != 0 && isPoint(columnArray[currentColumnIndex - 1].children[currentRow])) {
+      while(currentColumnIndex != 0 && isPoint(columnArray[currentColumnIndex - 1].children[currentRow], playerColor)) {
         currentColumnIndex --;
         count ++;
       }
@@ -80,7 +86,7 @@ function isGameFinished(currentColumn, currentRow) {
         //reset count and current column, because we start the count over once we change directions
         currentColumnIndex = initialColumnIndex;
         count = 1;
-        while(currentRow != 5 && isPoint(columnArray[currentColumnIndex].children[currentRow + 1])){
+        while(currentRow != 5 && isPoint(columnArray[currentColumnIndex].children[currentRow + 1], playerColor)){
           currentRow ++;
           count ++;
         }
@@ -94,7 +100,7 @@ function isGameFinished(currentColumn, currentRow) {
           count = 1;
           //first start right diagonally up
           while(currentRow != 0 && currentColumnIndex != 6 &&
-            isPoint(columnArray[currentColumnIndex+1].children[currentRow-1]))
+            isPoint(columnArray[currentColumnIndex+1].children[currentRow-1], playerColor))
             {
               count ++;
               currentColumnIndex ++;
@@ -104,7 +110,7 @@ function isGameFinished(currentColumn, currentRow) {
           currentColumnIndex = initialColumnIndex;
           currentRow = initialRow;
           while(currentRow !=5 && currentColumnIndex != 0 &&
-            isPoint(columnArray[currentColumnIndex-1].children[currentRow+1])){
+            isPoint(columnArray[currentColumnIndex-1].children[currentRow+1], playerColor)){
               count++;
               currentColumnIndex--;
               currentRow++;
@@ -119,7 +125,7 @@ function isGameFinished(currentColumn, currentRow) {
              count = 1;
              //first start left diagonally up
              while(currentRow != 0 && currentColumnIndex != 0 &&
-              isPoint(columnArray[currentColumnIndex-1].children[currentRow-1])) {
+              isPoint(columnArray[currentColumnIndex-1].children[currentRow-1], playerColor)) {
                 count ++;
                 currentColumnIndex --;
                 currentRow --;
@@ -129,7 +135,7 @@ function isGameFinished(currentColumn, currentRow) {
              currentRow = initialRow;
 
              while(currentRow != 5 && currentColumnIndex != 6 &&
-              isPoint(columnArray[currentColumnIndex+1].children[currentRow+1])) {
+              isPoint(columnArray[currentColumnIndex+1].children[currentRow+1] , playerColor)) {
                 count ++;
                 currentColumnIndex ++;
                 currentRow ++;
@@ -146,8 +152,8 @@ function isGameFinished(currentColumn, currentRow) {
 //yellow = rgb(255, 255, 0)
 //white = rgb(255, 255, 255)
 
-function isPoint(circle) {
-  if (this.currentPlayer == 1) {
+function isPoint(circle, playerColor) {
+  if (playerColor == "yellow") {
     return (
       window.getComputedStyle(circle).backgroundColor == "rgb(255, 255, 0)"
     );
@@ -156,14 +162,14 @@ function isPoint(circle) {
   }
 }
 
-function playerWins() {
+function playerWins(turnColor) {
   let wrapper = document.querySelector(".board-wrapper");
   wrapper.style.display = 'none';
 
   let winScreen = document.querySelector('.win-screen');
   winScreen.style.display = 'flex';
   let winScreenPlayer = document.querySelector("#win-screen-player");
-  if(this.currentPlayer == 1){
+  if(turnColor == "yellow"){
     winScreenPlayer.style.color = 'yellow';
     winScreenPlayer.innerText = 'Player 2'
   }
@@ -203,7 +209,7 @@ function resetMatrix() {
   }
 }
 
-function fillTable() {
+function fillTable(matrix) {
   //create a 2d array of the board containing the div elements
   let columnArray = [];
   for (let i = 1; i <= 7; i++) {
@@ -226,3 +232,62 @@ function fillTable() {
   }
 }
 
+function showBoard() {
+  let menuWrapper = document.querySelector(".create-game-wrapper");
+  menuWrapper.style.display = 'none';
+
+  let boardWrapper = document.querySelector(".board-wrapper");
+  boardWrapper.style.display = 'block';
+}
+
+function getMatrix() {
+  return matrix;
+}
+
+function disableBoard(playerColor) {
+  //disable the board if your color is not the same as the one below the board
+  let boardCover = document.querySelector(".board-cover");
+  let currentPlayerTurn = document.querySelector(".chip");
+  let currentPlayerTurnColor =
+    window.getComputedStyle(currentPlayerTurn).backgroundColor;
+  if (currentPlayerTurnColor == "rgb(255, 0, 0)") {
+    currentPlayerTurnColor = "red";
+  } else {
+    currentPlayerTurnColor = "yellow";
+  }
+  if (playerColor == currentPlayerTurnColor) {
+    boardCover.style.display = "none";
+  }
+  else {
+    boardCover.style.display = "block";
+  }
+}
+
+
+//change the color and text of the turn below the board when someone plays
+function changeTurn(playerColor) {
+  let playerTurnColor = document.querySelector(".chip");
+  let playerTurnText = document.querySelector("#playerText");
+
+  if(playerColor == "red") {
+    playerTurnColor.style.backgroundColor = "yellow";
+    playerTurnText.innerText = "Player 2";
+    playerTurnColor.style.boxShadow = "inset 5px 0px 5px rgb(145, 145, 7)";
+  }
+
+  else {
+    playerTurnColor.style.backgroundColor = "red";
+    playerTurnText.innerText = "Player 1";
+    playerTurnColor.style.boxShadow = "inset 5px 0px 5px rgb(128, 0, 0)";
+  }
+  disableBoard(playerColor);
+}
+
+function disableButton() {
+  if(document.querySelector("#txtGameId").value == ""){
+    document.querySelector("#btnJoin").disabled = true;
+  }
+  else {
+    document.querySelector("#btnJoin").disabled = false;
+  }
+}
