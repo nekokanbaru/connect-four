@@ -8,7 +8,7 @@ app.listen(8081, () => console.log("listening on https port 8081"));
 // const websocketServer = require("websocket").server;
 // const httpServer = http.createServer();
 // httpServer.listen(8080, () => console.log("listening on https port 8080"))
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 
 const clients = {};
 const games = {};
