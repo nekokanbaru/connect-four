@@ -8,14 +8,13 @@ app.listen(8081, () => console.log("listening on https port 8081"));
 // const websocketServer = require("websocket").server;
 // const httpServer = http.createServer();
 // httpServer.listen(8080, () => console.log("listening on https port 8080"))
-const PORT = 8080;
 
 const clients = {};
 const games = {};
 
 const wsServer = new WebSocket.Server({
     // "httpServer": httpServer
-    port: PORT
+    port: 8080
 })
 wsServer.on("request", request => {
     //connect
