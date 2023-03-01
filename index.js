@@ -16,8 +16,9 @@ const wsServer = new WebSocket.Server({
     // "httpServer": httpServer
     port: 8080
 })
-wsServer.on('connection', ws => {
+
 wsServer.on("request", request => {
+    console.log("listening on port 8080")
     //connect
     const connection = request.accept(null, request.origin)
     connection.on("open", () => console.log("opened!"))
@@ -103,9 +104,7 @@ wsServer.on("request", request => {
     //send back the client connect
     connection.send(JSON.stringify(payLoad))
 })
-ws.send('Hello! Message From Server!!')
-console.log("listening on port 8080")
-})
+
 
 function updateGameState() {
     
