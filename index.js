@@ -1,5 +1,5 @@
 // const http = require("http");
-const WebSocket = require('ws');
+const WebSocket = require('websocket');
 const app = require("express")();
 app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"));
 app.get("/style.css", (req,res) => res.sendFile(__dirname + "/style.css"));
