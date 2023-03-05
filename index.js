@@ -1,19 +1,19 @@
-const http = require("http");
+const https = require("https");
 const app = require("express")();
 app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"));
 app.get("/style.css", (req,res) => res.sendFile(__dirname + "/style.css"));
 app.get("/main.js", (req,res) => res.sendFile(__dirname + "/main.js"));
 app.listen(8081, () => console.log("listening on https port 8081"));
-const websocketServer = require("websocket").server;
-const httpServer = http.createServer();
-httpServer.listen(8080, () => console.log("listening on https port 8080"))
+const WebSocket = require('ws');
+const httpsServer = new https.createServer();
+
 
 const clients = {};
 const games = {};
 
-const wsServer = new websocketServer({
-    "httpServer": httpServer
-})
+const wsServer = new WebSocket.Server({
+    "server":httpsServer
+});
 wsServer.on("request", request => {
     //connect
     const connection = request.accept(null, request.origin)
@@ -124,3 +124,5 @@ function S4() {
  
 // then to call it, plus stitch in '4' in the third group
 const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+
+httpsServer.listen(8080, () => console.log("listening on https port 8080"))
