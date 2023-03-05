@@ -12,7 +12,8 @@ const clients = {};
 const games = {};
 
 const wsServer = new WebSocket.Server({
-    "server":httpsServer
+    "server": httpsServer,
+    "port": 8080
 });
 wsServer.on("request", request => {
     //connect
